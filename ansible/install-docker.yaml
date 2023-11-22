@@ -4,26 +4,29 @@
   hosts: all
   become: true
   tasks:
-    - name: Import Docker GPG key
-      apt_key:
+    - name: Add Docker GPG key
+      ansible.builtin.get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+        dest: /tmp/docker-gpg
+
+    - name: Import Docker GPG key
+      ansible.builtin.shell: gpg --import /tmp/docker-gpg
 
     - name: Add Docker APT repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
 
     - name: Update apt repositories
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
 
     - name: Install Docker
-      apt:
+      ansible.builtin.apt:
         name: docker-ce
         state: present
 
     - name: Add user to docker group
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_user }}"
         groups: docker
