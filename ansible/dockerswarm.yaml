@@ -33,6 +33,11 @@
       token: "{{ hostvars[groups['masters'][0]]['worker_token']['stdout'] }}"
       master: "{{ hostvars[groups['masters'][0]]['inventory_hostname'] }}"
     tasks:
+      - name: Reload systemd daemons
+        ansible.builtin.systemd:
+           daemon_reload: true
+           name: docker
+           state: restarted
       - name: Join Swarm Cluster as a Worker
         command: sudo usermod -aG docker {{remote_user}}
         command: sudo docker swarm join --token {{ token }} {{ master }}:2377
